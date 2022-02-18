@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { json } = require("express/lib/response");
+const jwt = require("jsonwebtoken");
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -24,18 +24,27 @@ router.post("/register", async (req, res) => {
 //LOGIN
 
 router.post("/login", async (req, res) => {
-
-  const user = await User.findOne({ username: req.body.username});
+  const user = await User.findOne({ username: req.body.username });
 
   if (user == null) {
     return res.status(400).send("cannot find user");
   }
   try {
-   
     if (await bcrypt.compare(req.body.password, user.password)) {
-      res.status(201).json(user);
+      const accessToken = jwt.sign(
+        {
+          id: user._id,
+          isAdmin: user.isAdmin,
+        },
+        process.env.JWT_SEC,
+        { expiresIn: "3d" }
+      );
+
+      const { password, ...others } = user._doc;
+
+      res.status(201).json({ ...others, accessToken });
     } else {
-      res.send("Not Allowed");
+      res.send("Wrong Password");
     }
   } catch (err) {
     res.status(500).json(err);
