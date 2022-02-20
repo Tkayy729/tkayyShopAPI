@@ -79,7 +79,8 @@ router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
         $match: { createdAt: { $gte: lastYear } },
       },
       {
-        $project: {
+        $project: 
+        {
           month: { $month: "$createdAt" },
         },
       },

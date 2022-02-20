@@ -3,7 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-//REGISTER
+//REGISTER USER
 router.post("/register", async (req, res) => {
   const saltPassword = await bcrypt.genSalt(10);
   const securePassword = await bcrypt.hash(req.body.password, saltPassword);
@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-//LOGIN
+//LOGIN USER
 
 router.post("/login", async (req, res) => {
   const user = await User.findOne({ username: req.body.username });
